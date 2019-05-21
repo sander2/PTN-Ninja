@@ -15,6 +15,7 @@ define([
   'text!../../sample.ptn',
   'lodash',
   'jquery',
+  'simple-modal',
   'bililiteRange',
   'bililiteRange.undo',
   'bililiteRange.fancytext',
@@ -77,26 +78,7 @@ define([
 
     tpl: {
       dialog: _.template(
-        '<dialog class="mdl-dialog">'+
-          '<h3 class="mdl-dialog__title"><%=title%></h3>'+
-          '<div class="mdl-dialog__content">'+
-            '<%=content%>'+
-          '</div>'+
-          '<div class="mdl-dialog__actions">'+
-            '<% _.each(actions, function (action) { %>'+
-              '<button type="button" class="mdl-button mdl-button--flat'+
-                '<%= action.className ? " "+action.className : "" %>"'+
-                '<% _.each(_.omit(action, ["label", "value", "callback", "className"]), function(value, key) { %>'+
-                  '<% if (_.isBoolean(value)) { %>'+
-                    ' <%= value ? key : "" %>'+
-                  '<% } else { %>'+
-                    ' <%=key%>="<%-value%>"'+
-                  '<% } %>'+
-                '<% }) %>'+
-              '><%=action.label%></button>'+
-            '<% }) %>'+
-          '</div>'+
-        '</dialog>'
+        '<dialog class="mdl-dialog"><h3 class="mdl-dialog__title">PTN Ninja</h3></dialog>'
       )
     },
 
@@ -107,58 +89,59 @@ define([
 
     dialog: function (opt) {
       var that = this;
-
-      var $dialog = $(
-            this.tpl.dialog({
-              title: opt.title,
-              content: opt.content,
-              actions: opt.actions || []
-            })
-          ).addClass(opt.className).appendTo(this.$body);
-
-      var dialog = $dialog[0]
-        , $actions = $dialog.find('.mdl-dialog__actions button')
-        , $action;
-
-      function close () {
-        dialog.close();
-        _.pull(that.current_dialogs, dialog);
-        $dialog.remove();
-      }
-
-      if (!dialog.showModal) {
-        dialogPolyfill.registerDialog(dialog);
-      }
-
-      $dialog.find('[class^=mdl]').each(function (i, element) {
-        componentHandler.upgradeElement(element);
+      var modal1 = new SimpleModal({
+          size: 'large',
+          title: opt.tital,
+          body: opt.content,
       });
+      modal1.show();
+      // var $dialog = $(
+      //       '<dialog><h3>PTN Ninja</h3></dialog>'
+      //     ).appendTo(this.$body);
+      // $dialog[0].showModal();
+      // var dialog = $dialog[0]
+      //   , $actions = $dialog.find('.mdl-dialog__actions button')
+      //   , $action;
 
-      _.each(opt.actions, function (action, i) {
-        var value = _.has(action, 'value') ? action.value : i
-          , callback = _.has(action, 'callback') ? action.callback : false;
+      // function close () {
+      //   dialog.close();
+      //   _.pull(that.current_dialogs, dialog);
+      //   $dialog.remove();
+      // }
 
-        $action = $actions.eq(i);
+      // if (!dialog.showModal) {
+      //   dialogPolyfill.registerDialog(dialog);
+      // }
 
-        if (callback) {
-          $action.click(function () {
-            callback(value, $dialog);
-          });
-        }
-        $actions.eq(i).click(close);
-      });
+      // $dialog.find('[class^=mdl]').each(function (i, element) {
+      //   componentHandler.upgradeElement(element);
+      // });
 
-      dialog.showModal();
-      this.current_dialogs.push(dialog);
-      $dialog.find('input:eq(0)').focus();
-      if (opt.callback) {
-        $dialog.find('form').submit(function (event) {
-          opt.callback(event);
-          close();
-        });
-      }
+      // _.each(opt.actions, function (action, i) {
+      //   var value = _.has(action, 'value') ? action.value : i
+      //     , callback = _.has(action, 'callback') ? action.callback : false;
 
-      return dialog;
+      //   $action = $actions.eq(i);
+
+      //   if (callback) {
+      //     $action.click(function () {
+      //       callback(value, $dialog);
+      //     });
+      //   }
+      //   $actions.eq(i).click(close);
+      // });
+
+      // dialog.showModal();
+      // this.current_dialogs.push(dialog);
+      // $dialog.find('input:eq(0)').focus();
+      // if (opt.callback) {
+      //   $dialog.find('form').submit(function (event) {
+      //     opt.callback(event);
+      //     close();
+      //   });
+      // }
+
+      return modal1;
     },
 
     confirm: function (text, callback) {

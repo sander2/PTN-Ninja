@@ -212,7 +212,39 @@ requirejs({locale: navigator.language}, [
         app.toggle_edit_mode(true);
       }
     } else {
-      app.toggle_edit_mode();
+
+      var last_move = (app.game.moves[app.game.moves.length-1].plys[1] === undefined ?  app.game.moves[app.game.moves.length-1].plys[0] : app.game.moves[app.game.moves.length-1].plys[1]).print_text();
+      // send move/game to server
+      // to send: app.$ptn.text()
+     document.cookie = "SecondProperty=SecondPropertyValue";
+     let data = {element: "barium"};
+
+// fetch("/mysocket2", {
+//   method: "GET", 
+// }).then(res => {
+//   console.log("Request complete! response:", res);
+// });
+
+      var webSocket = new WebSocket('ws://127.0.0.1:3000/mysocket');
+
+      webSocket.onopen = function (event) {
+        console.log("Opened connection");
+          var msg = {
+            move: _.trim(last_move),
+            gameID: 1,
+            ply_num: app.game.moves.length-1
+          };
+
+        // Send the msg object as a JSON-formatted string.
+        webSocket.send(JSON.stringify(msg));
+      };
+      webSocket.onerror = function(event) {
+        console.error("WebSocket error observed:", event);
+      };
+      webSocket.onclose = function(event) {
+        console.log("WebSocket is closed now:", event);
+      };
+      console.log("test: " + last_move);      
     }
   }).mouseover(function () {
     app.$fab.attr('title',
