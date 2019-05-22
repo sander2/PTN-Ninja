@@ -217,36 +217,43 @@ requirejs({locale: navigator.language}, [
       // send move/game to server
       // to send: app.$ptn.text()
      document.cookie = "SecondProperty=SecondPropertyValue";
-     let data = {element: "barium"};
 
-// fetch("/mysocket2", {
-//   method: "GET", 
-// }).then(res => {
-//   console.log("Request complete! response:", res);
-// });
+      fetch('/domove', {
+        method: 'POST',
+        body: JSON.stringify({
+                  move: _.trim(last_move),
+                  gameID: 1,
+                  ply_num: app.game.plys.length
+                }),
+        headers:{
+          'Content-Type': 'application/json'
+        }
+      }).then(res => res.json())
+      .then(response => console.log('Success:', JSON.stringify(response)))
+      .catch(error => console.error('Error:', error));
 
-      app.webSocket = new WebSocket('ws://127.0.0.1:3000/mysocket');
+      // app.webSocket = new WebSocket('ws://127.0.0.1:3000/mysocket');
 
-      app.webSocket.onopen = function (event) {
-        console.log("Opened connection");
-          var msg = {
-            move: _.trim(last_move),
-            gameID: 1,
-            ply_num: app.game.plys.length
-          };
+      // app.webSocket.onopen = function (event) {
+      //   console.log("Opened connection");
+      //     var msg = {
+      //       move: _.trim(last_move),
+      //       gameID: 1,
+      //       ply_num: app.game.plys.length
+      //     };
 
-        // Send the msg object as a JSON-formatted string.
-        app.webSocket.send(JSON.stringify(msg));
-      };
-      app.webSocket.onmessage = function(event) {
-        console.debug("WebSocket message received:", event);
-      };
-      app.webSocket.onerror = function(event) {
-        console.error("WebSocket error observed:", event);
-      };
-      app.webSocket.onclose = function(event) {
-        console.log("WebSocket is closed now:", event);
-      };
+      //   // Send the msg object as a JSON-formatted string.
+      //   app.webSocket.send(JSON.stringify(msg));
+      // };
+      // app.webSocket.onmessage = function(event) {
+      //   console.debug("WebSocket message received:", event);
+      // };
+      // app.webSocket.onerror = function(event) {
+      //   console.error("WebSocket error observed:", event);
+      // };
+      // app.webSocket.onclose = function(event) {
+      //   console.log("WebSocket is closed now:", event);
+      // };
       console.log("test: " + last_move);      
     }
   }).mouseover(function () {
