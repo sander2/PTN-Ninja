@@ -26,9 +26,9 @@ define(['i18n!nls/main', 'lodash'], function (t, _) {
         show_axis_labels: true,
         show_flat_counts: true,
         show_branches: true,
-        show_current_move: true,
+        show_current_move: false,
         show_unplayed_pieces: true,
-        show_play_controls: true
+        show_play_controls: false
       },
       minimal: {
         annotations: true,
@@ -47,7 +47,7 @@ define(['i18n!nls/main', 'lodash'], function (t, _) {
         show_branches: true,
         show_current_move: false,
         show_unplayed_pieces: false,
-        show_play_controls: true
+        show_play_controls: false
       },
       play_mode: {
         annotations: true,
@@ -56,9 +56,9 @@ define(['i18n!nls/main', 'lodash'], function (t, _) {
         show_axis_labels: false,
         show_flat_counts: true,
         show_branches: true,
-        show_current_move: true,
+        show_current_move: false,
         show_unplayed_pieces: true,
-        show_play_controls: true
+        show_play_controls: false
       }
     },
 

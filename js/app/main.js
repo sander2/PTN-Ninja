@@ -29,6 +29,12 @@ requirejs({locale: navigator.language}, [
   app.$body = $('body');
 
   app.webSocket = undefined;
+
+  if (Notification.permission !== "denied") {
+    Notification.requestPermission();
+  }
+
+
   // Templatize i18n strings
   (function () {
     function _templatize(parent) {
@@ -493,6 +499,10 @@ requirejs({locale: navigator.language}, [
       };
       app.webSocket.onmessage = function(event) {
         var dat = JSON.parse(event.data);
+        if (Notification.permission === "granted") {
+          // If it's okay let's create a notification
+          var notification = new Notification(`${dat.opponent} has made a move!`);
+        }
         app.fetchptn(dat.gameID)
         console.debug("WebSocket message received:", event);
       };
