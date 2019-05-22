@@ -225,23 +225,26 @@ requirejs({locale: navigator.language}, [
 //   console.log("Request complete! response:", res);
 // });
 
-      var webSocket = new WebSocket('ws://127.0.0.1:3000/mysocket');
+      app.webSocket = new WebSocket('ws://127.0.0.1:3000/mysocket');
 
-      webSocket.onopen = function (event) {
+      app.webSocket.onopen = function (event) {
         console.log("Opened connection");
           var msg = {
             move: _.trim(last_move),
             gameID: 1,
-            ply_num: app.game.moves.length-1
+            ply_num: app.game.plys.length
           };
 
         // Send the msg object as a JSON-formatted string.
-        webSocket.send(JSON.stringify(msg));
+        app.webSocket.send(JSON.stringify(msg));
       };
-      webSocket.onerror = function(event) {
+      app.webSocket.onmessage = function(event) {
+        console.debug("WebSocket message received:", event);
+      };
+      app.webSocket.onerror = function(event) {
         console.error("WebSocket error observed:", event);
       };
-      webSocket.onclose = function(event) {
+      app.webSocket.onclose = function(event) {
         console.log("WebSocket is closed now:", event);
       };
       console.log("test: " + last_move);      
@@ -451,38 +454,54 @@ requirejs({locale: navigator.language}, [
   var ply_index
     , ply_is_done
     , target_branch = null;
+  
 
-  if (app.hash.indexOf('&') >= 0) {
-    ply_index = app.hash.match(/&ply=(\d+!?)/);
-    if (ply_index) {
-      ply_is_done = ply_index[1].indexOf('!') > 0;
-      ply_index = parseInt(ply_index[1], 10);
-    }
+  // if (app.hash.indexOf('&') >= 0) {
+  //   ply_index = app.hash.match(/&ply=(\d+!?)/);
+  //   if (ply_index) {
+  //     ply_is_done = ply_index[1].indexOf('!') > 0;
+  //     ply_index = parseInt(ply_index[1], 10);
+  //   }
 
-    if (app.hash.indexOf('&mode=edit') >= 0) {
-      app.mode = 'edit';
-    }
+  //   if (app.hash.indexOf('&mode=edit') >= 0) {
+  //     app.mode = 'edit';
+  //   }
 
-    if (app.hash.indexOf('&branch=') >= 0) {
-      target_branch = app.hash.match(/&branch=([0-9.-]+)/)[1];
-    }
+  //   if (app.hash.indexOf('&branch=') >= 0) {
+  //     target_branch = app.hash.match(/&branch=([0-9.-]+)/)[1];
+  //   }
 
-    app.hash = app.hash.replace(/&.*$/, '');
+  //   app.hash = app.hash.replace(/&.*$/, '');
+  // }
+
+  var gameid_index = location.href.match(/[&?]gameid=(\d+)/);
+  if (gameid_index) {
+    gameid_index = parseInt(gameid_index[1], 10);
+    fetch("/getgame?id=" + gameid_index, {
+      method: "GET", 
+    })
+    .then((resp) => resp.json()) // Transform the data into json
+    .then(res => {
+      console.log("Request complete! response:", res);
+      // Load the initial PTN
+      app.game.parse(
+        res.ptn,
+        false,
+        true
+      );
+      app.clear_undo_history();
+      app.board.last();
+    });
   }
+    
 
-  // Load the initial PTN
-  app.game.parse(
-    app.hash || app.default_ptn(),
-    !!app.hash,
-    !sessionStorage.ptn
-  );
-  app.clear_undo_history();
 
-  // Go to initial ply
-  if (_.isNumber(ply_index)) {
-    app.board.target_branch = target_branch;
-    app.board.go_to_ply(ply_index, ply_is_done);
-  }
+
+  // // Go to initial ply
+  // if (_.isNumber(ply_index)) {
+  //   app.board.target_branch = target_branch;
+  //   app.board.go_to_ply(ply_index, ply_is_done);
+  // }
 
 
   // Listen for caret movement
