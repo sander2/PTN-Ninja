@@ -28,6 +28,7 @@ requirejs({locale: navigator.language}, [
   app.$html = $('html');
   app.$body = $('body');
 
+  app.webSocket = undefined;
   // Templatize i18n strings
   (function () {
     function _templatize(parent) {
@@ -214,10 +215,8 @@ requirejs({locale: navigator.language}, [
     } else {
 
       var last_move = (app.game.moves[app.game.moves.length-1].plys[1] === undefined ?  app.game.moves[app.game.moves.length-1].plys[0] : app.game.moves[app.game.moves.length-1].plys[1]).print_text();
-      // send move/game to server
-      // to send: app.$ptn.text()
-     document.cookie = "SecondProperty=SecondPropertyValue";
 
+      // send move/game to server
       fetch('/domove', {
         method: 'POST',
         body: JSON.stringify({
@@ -232,28 +231,9 @@ requirejs({locale: navigator.language}, [
       .then(response => console.log('Success:', JSON.stringify(response)))
       .catch(error => console.error('Error:', error));
 
-      // app.webSocket = new WebSocket('ws://127.0.0.1:3000/mysocket');
+      app.connectNotificationSocket();
+      
 
-      // app.webSocket.onopen = function (event) {
-      //   console.log("Opened connection");
-      //     var msg = {
-      //       move: _.trim(last_move),
-      //       gameID: 1,
-      //       ply_num: app.game.plys.length
-      //     };
-
-      //   // Send the msg object as a JSON-formatted string.
-      //   app.webSocket.send(JSON.stringify(msg));
-      // };
-      // app.webSocket.onmessage = function(event) {
-      //   console.debug("WebSocket message received:", event);
-      // };
-      // app.webSocket.onerror = function(event) {
-      //   console.error("WebSocket error observed:", event);
-      // };
-      // app.webSocket.onclose = function(event) {
-      //   console.log("WebSocket is closed now:", event);
-      // };
       console.log("test: " + last_move);      
     }
   }).mouseover(function () {
@@ -481,9 +461,7 @@ requirejs({locale: navigator.language}, [
   //   app.hash = app.hash.replace(/&.*$/, '');
   // }
 
-  var gameid_index = location.href.match(/[&?]gameid=(\d+)/);
-  if (gameid_index) {
-    gameid_index = parseInt(gameid_index[1], 10);
+  app.fetchptn = function(gameid) {
     fetch("/getgame?id=" + gameid_index, {
       method: "GET", 
     })
@@ -499,11 +477,34 @@ requirejs({locale: navigator.language}, [
       app.clear_undo_history();
       app.board.last();
     });
+  };
+  var gameid_index = location.href.match(/[&?]gameid=(\d+)/);
+  if (gameid_index) {
+    gameid_index = parseInt(gameid_index[1], 10);
+    app.fetchptn(gameid_index);
   }
-    
 
-
-
+  // ensures the notification socket is open
+  app.connectNotificationSocket = function() {
+    if (_.isUndefined(app.webSocket)|| app.webSocket.readyState != 1){ // 1=open
+      app.webSocket = new WebSocket('ws://127.0.0.1:3000/mysocket');
+      app.webSocket.onopen = function (event) {
+        console.log("Opened connection");
+      };
+      app.webSocket.onmessage = function(event) {
+        var dat = JSON.parse(event.data);
+        app.fetchptn(dat.gameID)
+        console.debug("WebSocket message received:", event);
+      };
+      app.webSocket.onerror = function(event) {
+        console.error("WebSocket error observed:", event);
+      };
+      app.webSocket.onclose = function(event) {
+        console.log("WebSocket is closed now:", event);
+      };
+    }
+  }
+  app.connectNotificationSocket();
   // // Go to initial ply
   // if (_.isNumber(ply_index)) {
   //   app.board.target_branch = target_branch;
