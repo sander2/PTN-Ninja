@@ -219,6 +219,7 @@ requirejs({locale: navigator.language}, [
         app.toggle_edit_mode(true);
       }
     } else {
+      // Send move to server
 
       var last_move = (app.game.moves[app.game.moves.length-1].plys[1] === undefined ?  app.game.moves[app.game.moves.length-1].plys[0] : app.game.moves[app.game.moves.length-1].plys[1]).print_text();
 
@@ -237,10 +238,8 @@ requirejs({locale: navigator.language}, [
       .then(response => console.log('Success:', JSON.stringify(response)))
       .catch(error => console.error('Error:', error));
 
+      // reconnect the socket for notifications in case it timed out
       app.connectNotificationSocket();
-      
-
-      console.log("test: " + last_move);      
     }
   }).mouseover(function () {
     app.$fab.attr('title',
@@ -447,25 +446,7 @@ requirejs({locale: navigator.language}, [
   var ply_index
     , ply_is_done
     , target_branch = null;
-  
 
-  // if (app.hash.indexOf('&') >= 0) {
-  //   ply_index = app.hash.match(/&ply=(\d+!?)/);
-  //   if (ply_index) {
-  //     ply_is_done = ply_index[1].indexOf('!') > 0;
-  //     ply_index = parseInt(ply_index[1], 10);
-  //   }
-
-  //   if (app.hash.indexOf('&mode=edit') >= 0) {
-  //     app.mode = 'edit';
-  //   }
-
-  //   if (app.hash.indexOf('&branch=') >= 0) {
-  //     target_branch = app.hash.match(/&branch=([0-9.-]+)/)[1];
-  //   }
-
-  //   app.hash = app.hash.replace(/&.*$/, '');
-  // }
 
   app.fetchptn = function(gameid) {
     fetch("/getgame?id=" + gameid_index, {
@@ -484,6 +465,8 @@ requirejs({locale: navigator.language}, [
       app.board.last();
     });
   };
+
+  // If gameid is specified in the url, load it
   var gameid_index = location.href.match(/[&?]gameid=(\d+)/);
   if (gameid_index) {
     gameid_index = parseInt(gameid_index[1], 10);
@@ -500,7 +483,6 @@ requirejs({locale: navigator.language}, [
       app.webSocket.onmessage = function(event) {
         var dat = JSON.parse(event.data);
         if (Notification.permission === "granted") {
-          // If it's okay let's create a notification
           var notification = new Notification(`${dat.opponent} has made a move!`);
         }
         app.fetchptn(dat.gameID)
@@ -514,12 +496,8 @@ requirejs({locale: navigator.language}, [
       };
     }
   }
+
   app.connectNotificationSocket();
-  // // Go to initial ply
-  // if (_.isNumber(ply_index)) {
-  //   app.board.target_branch = target_branch;
-  //   app.board.go_to_ply(ply_index, ply_is_done);
-  // }
 
 
   // Listen for caret movement

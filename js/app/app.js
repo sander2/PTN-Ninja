@@ -16,7 +16,6 @@ define([
   'lodash',
   'jquery',
   'dialog-polyfill',
-  'simple-modal',
   'bililiteRange',
   'bililiteRange.undo',
   'bililiteRange.fancytext',
