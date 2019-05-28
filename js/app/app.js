@@ -334,24 +334,6 @@ define([
     },
 
     update_url: function () {
-      var url = app.game.ptn_compressed;
-
-      if (app.board.current_ply) {
-        url += '&ply='+app.board.current_ply.index;
-        if (app.board.ply_is_done) {
-          url += '!';
-        }
-        if (app.board.target_branch) {
-          url += '&branch='+app.board.target_branch;
-        }
-      }
-
-      if (app.mode == 'edit') {
-        url += '&mode=edit';
-      }
-
-      history.replaceState(undefined, undefined, '?#'+url);
-      config.set('last_session', location.hash);
     },
 
     update_ptn: function () {
