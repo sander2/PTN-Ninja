@@ -29,6 +29,7 @@ requirejs({locale: navigator.language}, [
   app.$body = $('body');
 
   app.webSocket = undefined;
+  app.player_color = 'white';
 
   if (Notification.permission !== "denied") {
     Notification.requestPermission();
@@ -70,7 +71,7 @@ requirejs({locale: navigator.language}, [
     }
 
     function start(event) {
-      if ($this.timer) {
+      if ((app.player_color == 'black') == (app.game.plys.length % 2 == 0)) {
         return;
       }
 
@@ -472,7 +473,10 @@ requirejs({locale: navigator.language}, [
     gameid_index = parseInt(gameid_index[1], 10);
     app.fetchptn(gameid_index);
   }
-
+  var player_index = location.href.match(/[&?]color=(black|white)/);
+  if (player_index) {
+    app.player_color = player_index[1];
+  }
   // ensures the notification socket is open
   app.connectNotificationSocket = function() {
     if (_.isUndefined(app.webSocket)|| app.webSocket.readyState != 1){ // 1=open
