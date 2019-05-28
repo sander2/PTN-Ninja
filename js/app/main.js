@@ -476,7 +476,7 @@ requirejs({locale: navigator.language}, [
   // ensures the notification socket is open
   app.connectNotificationSocket = function() {
     if (_.isUndefined(app.webSocket)|| app.webSocket.readyState != 1){ // 1=open
-      app.webSocket = new WebSocket('ws://127.0.0.1:3000/mysocket');
+      app.webSocket = new WebSocket('wss://roadtotinue.com/mysocket');
       app.webSocket.onopen = function (event) {
         console.log("Opened connection");
       };
