@@ -1,11 +1,10 @@
-var version = 'v2.2.14';
+var version = 'v2.2.44';
 
 self.addEventListener('install', function(event) {
   console.log('WORKER: install event in progress.');
   event.waitUntil(
     caches.open(version + 'fundamentals').then(function(cache) {
       return cache.addAll([
-        '/',
         '/js/require.js',
         '/js/app.js',
         '/css/style.css',
@@ -58,7 +57,7 @@ self.addEventListener('fetch', function(event) {
 
         console.log('WORKER: fetch response from network.', event.request.url);
 
-        if (event.request.url.match(/(\/games|\/getgame)/) == null) {
+        if (event.request.url.match(/(\/games|\/getgame|\/$)/) == null) {
           caches
           .open(version + 'pages')
           .then(function add(cache) {
