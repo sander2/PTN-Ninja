@@ -31,7 +31,8 @@ requirejs({locale: navigator.language}, [
   app.webSocket = undefined;
   app.player_color = 'white';
 
-  if (Notification.permission !== "denied") {
+
+  if ('Notification' in window && Notification.permission !== "denied") {
     Notification.requestPermission();
   }
 
@@ -495,6 +496,9 @@ requirejs({locale: navigator.language}, [
   }
   // ensures the notification socket is open
   app.connectNotificationSocket = function() {
+    if (!('Notification' in window)) {
+      return;
+    }
     if (_.isUndefined(app.webSocket)|| app.webSocket.readyState != 1){ // 1=open
       app.webSocket = new WebSocket('wss://roadtotinue.com/mysocket');
       app.webSocket.onopen = function (event) {
