@@ -166,6 +166,7 @@ requirejs({locale: navigator.language}, [
   app.$editor = $('#editor');
   app.$editor.$bg = app.$editor.find('.background');
   app.$fab = $('#fab');
+  app.$fab2 = $('#fab2');
   app.$download = $('#download');
   app.$open = $('#open');
   app.$menu_edit = $('#menu-edit');
@@ -210,6 +211,21 @@ requirejs({locale: navigator.language}, [
 
 
   // Initialize FAB
+  app.$fab.attr('disabled', '');
+  app.$fab2.attr('disabled', '');
+  app.$fab2.on('touchstart click', function (event) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    // todo fix this
+    app.board.undo_ply();
+    app.board.trim_to_current_ply();
+
+    app.$fab.attr('disabled', '');
+    app.$fab2.attr('disabled', '');
+  }).mouseover(function () {
+    app.$fab2.attr('title', 'Undo move');
+  });
   app.$fab.on('touchstart click', function (event) {
     event.stopPropagation();
     event.preventDefault();
@@ -241,12 +257,12 @@ requirejs({locale: navigator.language}, [
 
       // reconnect the socket for notifications in case it timed out
       app.connectNotificationSocket();
+
+      app.$fab.attr('disabled', '');
+      app.$fab2.attr('disabled', '');
     }
   }).mouseover(function () {
-    app.$fab.attr('title',
-      app.$html.hasClass('error') ? t.Show_Hide_Errors :
-        app.game.is_editing ? t.Play_Mode : t.Edit_Mode
-    );
+    app.$fab.attr('title', 'Submit move');
   });
 
 

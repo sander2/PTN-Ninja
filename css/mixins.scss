@@ -17,10 +17,10 @@
 }
 
 @mixin selection {
-  &::-moz-selection {
+  #{if(&, "&", "*")}::-moz-selection {
     @content;
   }
-  &::selection {
+  #{if(&, "&", "*")}::selection {
     @content;
   }
 }

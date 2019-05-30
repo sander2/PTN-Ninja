@@ -470,6 +470,9 @@ define([
       app.update_url();
       app.range.pushstate();
       app.scroll_to_ply();
+
+      app.$fab.removeAttr('disabled');
+      app.$fab2.removeAttr('disabled');
     },
 
     resize: function (event) {
