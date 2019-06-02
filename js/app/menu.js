@@ -41,6 +41,10 @@ define([
       icon: 'help',
       onclick: 'app.about()'
     },{
+      label: 'Games',
+      icon: 'help',
+      onclick: 'app.showGameList()'
+    },{
       label: t.Permalink,
       icon: 'link',
       id: 'permalink',

@@ -188,6 +188,31 @@ define([
       });
     },
 
+    showGameList: function () {
+      fetch("/gamesinline", {
+        method: "GET", 
+      })
+      .then((resp) => resp.text()) // Transform the data into json
+      .then((data) => {
+        this.dialog({
+          title: 'Games',
+          content: data,
+          actions: [{}],
+          className: 'scrolling'
+        });
+      })
+      .catch((err) => {
+        this.dialog({
+          title: 'Games',
+          content: 'Error fetching games list',
+          actions: [{}],
+          className: 'scrolling'
+        });
+      });
+
+      
+    },
+
     create_new_game: function (event) {
       $(event.target).find('input').each(function (i, input) {
         if (input.name) {
