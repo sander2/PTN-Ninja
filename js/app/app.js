@@ -148,6 +148,10 @@ define([
         $actions.eq(i).click(close);
       });
 
+      if (opt.preShow) {
+        opt.preShow($dialog, close);
+      }
+
       dialog.showModal();
       this.current_dialogs.push(dialog);
       $dialog.find('input:eq(0)').focus();
@@ -198,7 +202,15 @@ define([
           title: 'Games',
           content: data,
           actions: [{}],
-          className: 'scrolling'
+          className: 'scrolling',
+          preShow: function (diag, closeDialog) {
+            diag.find('.game-selector').on('click', function(){
+              console.log('gameidz', $(this).attr('gameid'));
+              console.log('playerColor', $(this).attr('playerColor'));
+              app.fetchptn($(this).attr('gameid'), $(this).attr('playerColor'));
+              closeDialog();
+            });      
+          },
         });
       })
       .catch((err) => {

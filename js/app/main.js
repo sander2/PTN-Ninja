@@ -466,13 +466,16 @@ requirejs({locale: navigator.language}, [
     , target_branch = null;
 
 
-  app.fetchptn = function(gameid) {
-    fetch("/getgame?id=" + gameid_index, {
+  app.fetchptn = function(gameid, color) {
+    fetch("/getgame?id=" + gameid, {
       method: "GET", 
     })
     .then((resp) => resp.json()) // Transform the data into json
     .then(res => {
       console.log("Request complete! response:", res);
+      if (color != undefined) {
+        app.player_color = color;
+      }
       // Load the initial PTN
       app.game.parse(
         res.ptn,
@@ -482,18 +485,19 @@ requirejs({locale: navigator.language}, [
       app.clear_undo_history();
       app.board.last();
     });
+    history.pushState(undefined, undefined, 'index.html?gameid=' + gameid + '&color=' + app.player_color);
   };
 
   // If gameid is specified in the url, load it
   var gameid_index = location.href.match(/[&?]gameid=(\d+)/);
   if (gameid_index) {
     gameid_index = parseInt(gameid_index[1], 10);
-    app.fetchptn(gameid_index);
   }
   var player_index = location.href.match(/[&?]color=(black|white)/);
   if (player_index) {
     app.player_color = player_index[1];
   }
+  app.fetchptn(gameid_index, player_index[1]);
   // ensures the notification socket is open
   app.connectNotificationSocket = function() {
     if (!('Notification' in window)) {
