@@ -73,10 +73,6 @@ requirejs({locale: navigator.language}, [
     }
 
     function start(event) {
-      if ((app.player_color == 'black') == (app.game.plys.length % 2 == 0)) {
-        return;
-      }
-
       if (event.type == 'touchstart') {
         coords.x = event.originalEvent.touches[0].clientX;
         coords.y = event.originalEvent.touches[0].clientY;
@@ -246,7 +242,7 @@ requirejs({locale: navigator.language}, [
         method: 'POST',
         body: JSON.stringify({
                   move: _.trim(last_move),
-                  gameID: 1,
+                  gameID: app.gameid,
                   ply_num: app.game.plys.length
                 }),
         headers:{

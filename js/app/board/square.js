@@ -252,7 +252,8 @@ define(['app/config', 'i18n!nls/main', 'lodash'], function (config, t, _) {
       , is_alt_select = event && (!!event.click_duration || event.button == 2)
       , linenum = this.board.current_linenum()
       , player = linenum == 1 ? (this.board.turn == 1 ? 2 : 1) : this.board.turn
-      , piece, stone;
+      , piece, stone
+      , is_player_turn = (app.player_color == 'black') != (app.game.plys.length % 2 == 0);
 
 
     if (this.board.selected_pieces.length) {
@@ -282,6 +283,7 @@ define(['app/config', 'i18n!nls/main', 'lodash'], function (config, t, _) {
         this.board.go_to_ply(this.board.ply_index, false);
         if (!piece.ply.next) {
           this.board.current_move.plys.pop();
+          this.board.game.plys.pop();
         }
         this.board.game.insert_ply(
           stone + this.coord,
@@ -289,7 +291,7 @@ define(['app/config', 'i18n!nls/main', 'lodash'], function (config, t, _) {
           this.board.current_linenum(),
           this.board.turn
         );
-      } else if (linenum != 1) {
+      } else if (linenum != 1 && is_player_turn) {
         // Select piece or stack
         this.board.selected_pieces = is_alt_select ?
           [piece] : [piece].concat(piece.captives.slice(0, this.board.size - 1)
@@ -302,7 +304,7 @@ define(['app/config', 'i18n!nls/main', 'lodash'], function (config, t, _) {
         this.board.set_active_squares([this]);
         this.$view.addClass('selected');
       }
-    } else {
+    } else if (is_player_turn) {
       // Place piece as new ply
       stone = '';
 
