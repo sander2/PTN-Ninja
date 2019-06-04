@@ -157,7 +157,7 @@ define([
       $dialog.find('input:eq(0)').focus();
       if (opt.callback) {
         $dialog.find('form').submit(function (event) {
-          opt.callback(event);
+          opt.callback(event, $dialog);
           close();
         });
       }
@@ -201,13 +201,30 @@ define([
         this.dialog({
           title: 'Games',
           content: data,
-          actions: [{}],
+          actions: [{label: t.Close}],
           className: 'scrolling',
           preShow: function (diag, closeDialog) {
             diag.find('.game-selector').on('click', function(){
               console.log('gameidz', $(this).attr('gameid'));
               console.log('playerColor', $(this).attr('playerColor'));
               app.fetchptn($(this).attr('gameid'), $(this).attr('playerColor'));
+              closeDialog();
+            });
+            diag.find('.invitation-btn').on('click', function(){
+              
+              fetch('/acceptinvite', {
+                method: 'POST',
+                body: JSON.stringify({
+                          accept: !_.isUndefined($(this).attr('accept')),
+                          invitationid: $(this).closest('li').attr('invitationid'),
+                        }),
+                headers:{
+                  'Content-Type': 'application/json'
+                }
+              }).then(res => res.json())
+              .then(response => console.log('Success:', JSON.stringify(response)))
+              .catch(error => console.error('Error:', error));
+
               closeDialog();
             });      
           },
@@ -246,17 +263,26 @@ define([
             '<label class="mdl-textfield__label" for="board_size">'+t.Size+'</label>'+
           '</div>'+
           '<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">'+
-            '<input class="mdl-textfield__input" type="text" name="player1" value="'+config.player1+'" id="player1">'+
-            '<label class="mdl-textfield__label" for="player1">'+t.Player1+'</label>'+
-          '</div>'+
-          '<div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">'+
-            '<input class="mdl-textfield__input" type="text" name="player2" value="'+config.player2+'" id="player2">'+
-            '<label class="mdl-textfield__label" for="player2">'+t.Player2+'</label>'+
+            '<input class="mdl-textfield__input" type="text" name="opponent" value="" id="opponent">'+
+            '<label class="mdl-textfield__label" for="opponent">Opponent</label>'+
           '</div>'+
           '<input type="submit" hidden>'+
         '</form>',
-        callback: function (event) {
-          app.create_new_game(event);
+        callback: function (event, diag) {
+          console.log('board_size', diag.find('#board_size').val());
+          console.log('opponent', diag.find('#opponent').val());
+          fetch('/invite', {
+            method: 'POST',
+            body: JSON.stringify({
+                      board_size: diag.find('#board_size').val(),
+                      opponent: diag.find('#opponent').val(),
+                    }),
+            headers:{
+              'Content-Type': 'application/json'
+            }
+          }).then(res => res.json())
+          .then(response => console.log('Success:', JSON.stringify(response)))
+          .catch(error => console.error('Error:', error));
         },
         actions: [{
           label: t.OK,
