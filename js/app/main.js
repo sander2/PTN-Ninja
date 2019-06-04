@@ -30,6 +30,7 @@ requirejs({locale: navigator.language}, [
 
   app.webSocket = undefined;
   app.player_color = 'white';
+  app.gameid = 0;
 
 
   if ('Notification' in window && Notification.permission !== "denied") {
@@ -218,9 +219,8 @@ requirejs({locale: navigator.language}, [
     event.stopPropagation();
     event.preventDefault();
 
-    // todo fix this
-    app.board.undo_ply();
-    app.board.trim_to_current_ply();
+    // HACK. TODO: implement this more elegantly
+    app.fetchptn(app.gameid, app.player_color);
 
     app.$fab.attr('disabled', '');
     app.$fab2.attr('disabled', '');
@@ -476,6 +476,7 @@ requirejs({locale: navigator.language}, [
       if (color != undefined) {
         app.player_color = color;
       }
+      app.gameid = gameid;
       // Load the initial PTN
       app.game.parse(
         res.ptn,
