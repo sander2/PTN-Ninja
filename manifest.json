@@ -1,6 +1,6 @@
 {
-    "name": "PTN Ninja",
-    "short_name": "PTN Ninja",
+    "name": "Road to Tinue",
+    "short_name": "Road to Tinue",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
@@ -13,7 +13,7 @@
             "type": "image/png"
         }
     ],
-    "start_url": "https:\/\/ptn.ninja",
+    "start_url": "https:\/\/roadtotinue.com",
     "theme_color": "#5f7d8b",
     "background_color": "#5f7d8b",
     "display": "standalone"
