@@ -30,7 +30,7 @@ requirejs({locale: navigator.language}, [
 
   app.webSocket = undefined;
   app.player_color = 'white';
-  app.gameid = 0;
+  app.gameid = undefined;
 
 
   if ('Notification' in window && Notification.permission !== "denied") {
@@ -488,18 +488,17 @@ requirejs({locale: navigator.language}, [
   // If gameid is specified in the url, load it
   var gameid_index = location.href.match(/[&?]gameid=(\d+)/);
   if (gameid_index) {
-    gameid_index = parseInt(gameid_index[1], 10);
+    app.gameid = parseInt(gameid_index[1], 10);
   }
   var player_index = location.href.match(/[&?]color=(black|white)/);
   if (player_index) {
     app.player_color = player_index[1];
   }
-  app.fetchptn(gameid_index, player_index[1]);
+  if (!_.isUndefined(app.gameid)) {
+    app.fetchptn(gameid_index, player_index[1]);
+  }
   // ensures the notification socket is open
   app.connectNotificationSocket = function() {
-    if (!('Notification' in window)) {
-      return;
-    }
     if (_.isUndefined(app.webSocket)|| app.webSocket.readyState != 1){ // 1=open
       app.webSocket = new WebSocket('wss://roadtotinue.com/mysocket');
       app.webSocket.onopen = function (event) {
@@ -507,7 +506,7 @@ requirejs({locale: navigator.language}, [
       };
       app.webSocket.onmessage = function(event) {
         var dat = JSON.parse(event.data);
-        if (Notification.permission === "granted") {
+        if ('Notification' in window && Notification.permission === "granted") {
           var notification = new Notification(`${dat.opponent} has made a move!`);
         }
         app.fetchptn(dat.gameID)

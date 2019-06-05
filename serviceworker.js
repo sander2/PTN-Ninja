@@ -1,4 +1,4 @@
-var version = 'v2.2.44';
+var version = 'v2.2.46';
 
 self.addEventListener('install', function(event) {
   console.log('WORKER: install event in progress.');
@@ -57,7 +57,7 @@ self.addEventListener('fetch', function(event) {
 
         console.log('WORKER: fetch response from network.', event.request.url);
 
-        if (event.request.url.match(/(\/games|\/getgame|\/$)/) == null) {
+        if (event.request.url.match(/(\/games|\/getgame|\/gamesinline|\/$)/) == null) {
           caches
           .open(version + 'pages')
           .then(function add(cache) {
